@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+        }
+        p{
+            font-size: 24px;
+        }
+        .key{
+            width: 60px;  display:inline-flex; justify-content: center;
+            height: 200px;
+            margin: 2px;
+            background-color: white;
+            border: 1px solid black;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        .key:active{
+            background-color: lightseagreen;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Piano - Event Topic</h1>
+    <p><strong>Note: </strong>click or hover to play a Note</p>
+    <div>
+        <div class="key" data-note="C">C </div>
+        <div class="key" data-note="D">D</div>
+        <div class="key" data-note="E">E </div>
+        <div class="key" data-note="F">F </div>
+        <div class="key" data-note="G">G </div>
+        <div class="key" data-note="A">A </div>
+        <div class="key" data-note="B">B </div>
+    </div>
+    <audio id="C" src="freesound_community-lonely-piano-clip-32779.mp3"></audio>
+    <audio id="D" src="freesound_community-mi-80239.mp3"></audio>  
+    <audio id="E" src="freesound_community-piano-suspenses-14427.mp3"></audio>
+    <audio id="F" src="freesound_community-sad-song-piano-key-55287.mp3"></audio>
+    <audio id="G" src="11325622-piano-chords-239967.mp3"></audio>
+    <audio id="A" src="u_6hpkqeb47i-ting-bing-170228.mp3"></audio>
+    <audio id="B" src="bennyx-melancholic-piano-chords-275668.mp3"></audio>
+    
+    <script>
+        const keys = document.querySelectorAll('.key');
+        let currentAudio = null;
+
+        keys.forEach((key) => {
+            const note = key.dataset.note;
+            const audio = document.getElementById(note);
+
+            function playSound() {
+                // Stop previous sound
+                if (currentAudio && currentAudio !== audio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+
+                // Play new sound
+                audio.currentTime = 0;
+                audio.play().catch(() => {}); // avoid browser autoplay errors
+                currentAudio = audio;
+            }
+
+            // Click event (works everywhere)
+            key.addEventListener('click', playSound);
+
+            // Hover (better event than mouseover)
+            key.addEventListener('mouseenter', playSound);
+
+            // Touch support (mobile)
+            key.addEventListener('touchstart', playSound);
+            key.addEventListener('touchend', () => {
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                    currentAudio = null;
+                }
+            });
+        });
+        document.addEventListener("visibilitychange", function () {
+            if (document.hidden) {
+                // Stop currently playing audio when tab is hidden
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
