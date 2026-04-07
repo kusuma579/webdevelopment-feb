@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #dd217c, #ec9f11);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .container:hover {
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.9),
+                        0 0 50px rgba(255, 215, 0, 0.7),
+                        0 15px 35px rgba(0, 0, 0, 0.3);
+            transform: scale(1.03);
+            transition: 0.3s ease;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            background: #4facfe;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #007bff;
+        }
+
+        .weather-card {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .weather-card img {
+            width: 80px;
+        }
+
+        .datetime {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🌤 Weather App</h1>
+
+        <div class="search-box">
+            <input type="text" id="cityInput" placeholder="Enter city name">
+            <button onclick="getWeather()">Search</button>
+        </div>
+
+        <div class="datetime" id="datetime"></div>
+
+        <div class="weather-card" id="weatherCard">
+            <h2 id="city"></h2>
+            <p id="temp"></p>
+            <p id="condition"></p>
+            <p id="humidity"></p>
+            <p id="wind"></p>
+        </div>
+
+        <p class="error" id="error"></p>
+    </div>
+
+    <script>
+        const apiKey = "128141cecb59de6046b52590751ea76c";
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById("datetime").innerText =
+                now.toLocaleDateString() + " | " + now.toLocaleTimeString();
+        }
+
+        setInterval(updateDateTime, 1000);
+
+        async function getWeather() {
+            const city = document.getElementById("cityInput").value;
+            const error = document.getElementById("error");
+            const card = document.getElementById("weatherCard");
+
+            if (!city) {
+                error.innerText = "Please enter a city name!";
+                return;
+            }
+
+            try {
+                const res = await fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+                );
+
+                if (!res.ok) throw new Error("City not found");
+
+                const data = await res.json();
+
+                document.getElementById("city").innerText = data.name;
+                document.getElementById("temp").innerText = `🌡 Temp: ${data.main.temp}°C`;
+                document.getElementById("condition").innerText = `🌥 Condition: ${data.weather[0].main}`;
+                document.getElementById("humidity").innerText = `💧 Humidity: ${data.main.humidity}%`;
+                document.getElementById("wind").innerText = `🌬 Wind: ${data.wind.speed} m/s`;
+
+                const iconCode = data.weather[0].icon;
+                
+
+                card.style.display = "block";
+                error.innerText = "";
+
+            } catch (err) {
+                error.innerText = "City not found. Try again!";
+                card.style.display = "none";
+            }
+        }
+        
+    </script>
+</body>
+</html>
